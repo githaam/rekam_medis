@@ -1,3 +1,5 @@
-ini isi readme ketiga
+git add
 
-... mntp
+git commit -m "isi caption"
+
+git push -u origin main
