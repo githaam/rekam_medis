@@ -1,0 +1,117 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+use App\Models\Login;
+
+class Controller extends BaseController
+{
+    use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+
+    public function index()
+    {
+      return view('index');
+    }
+
+    public function create()
+    {
+      return view('create_data_login');
+    }
+
+    public function store(Request $request)
+    {
+      $this->validate($request, [
+        'username' => 'required|min:5',
+        'password' => 'required|min:5',
+        'level' => 'required|min:5'
+      ]);
+
+      $login = new Login;
+      $login -> username = $request -> username;
+      $login -> password = $request -> password;
+      $login -> level = $request -> level;
+      $login -> save();
+
+      return redirect('data_login/');
+    }
+
+    public function data_login()
+    {
+      $logins = Login::all();
+
+      // Insert
+      /*DB::table('login')->insert([
+        ['username' => 'semongQo', 'password' => 'jiakkhh', 'level' => 'dokter']
+      ]);*/
+
+      // Update
+      //DB::table('login') -> where('username','semongQo') -> update(['username' => 'jadi-Ini']);
+
+      // Delete
+      // DB::table('login') -> where('username','tarikSis') -> delete();
+
+      #$users = DB::table('login')->get();
+
+      return view('data_login', ['logins' => $logins]);
+    }
+
+    public function show($kd_user)
+    {
+      $login = Login::find($kd_user);
+
+      if(!$login)
+        abort(404);
+
+      return view('show_data_login', ['login' => $login]);
+    }
+
+    public function edit($kd_user)
+    {
+      $login = Login::find($kd_user);
+
+      if(!$login)
+        abort(404);
+
+      return view('edit_data_login', ['login' => $login]);
+    }
+
+    public function update(Request $request, $kd_user)
+    {
+      $login = Login::find($kd_user);
+      #$login->username = $request -> username;
+      $login->password = $request -> password;
+      #$login->level = $request -> level;
+      $login->save();
+      return redirect('data_login/'. $kd_user);
+
+      //Update Mass Assignment
+      /* Login::find(17)->update([
+        'username' => 'tambah',
+        'password' => 'add',
+        'level' => 'operator'
+      ]); */
+    }
+
+    public function delete($kd_user)
+    {
+      // Single Delete Ilequent
+      $login = Login::find($kd_user);
+      $login->delete();
+
+      // Mass Assignment Ilequent
+      //Login::destroy(16);
+
+      //Restoring specific SoftDeletes
+      //Login::withTrashed()->find(16)->restore();
+
+      //View with all deleted
+      //$logins = Login::withTrashed()->get();
+      return redirect('data_login/');
+    }
+}
